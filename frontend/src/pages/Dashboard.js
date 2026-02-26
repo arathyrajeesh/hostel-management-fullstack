@@ -5,9 +5,12 @@ function Dashboard() {
 
     const [stats, setStats] = useState({
         rooms: 0,
+        students: 0,
         complaints: 0,
+        pending: 0,
         notices: 0,
-        attendance: 0,
+        paidBills: 0,
+        unpaidBills: 0,
     });
 
     useEffect(() => {
@@ -17,15 +20,26 @@ function Dashboard() {
     const loadDashboard = async () => {
         try {
         const rooms = await API.get("rooms/");
+        const students = await API.get("students/");
         const complaints = await API.get("complaints/");
         const notices = await API.get("notices/");
-        const attendance = await API.get("attendance/");
+        const bills = await API.get("mess-bill/");
+
+        const pendingComplaints = complaints.data.filter(
+            c => c.status === "pending"
+        ).length;
+
+        const paid = bills.data.filter(b => b.paid).length;
+        const unpaid = bills.data.filter(b => !b.paid).length;
 
         setStats({
             rooms: rooms.data.length,
+            students: students.data.length,
             complaints: complaints.data.length,
+            pending: pendingComplaints,
             notices: notices.data.length,
-            attendance: attendance.data.length,
+            paidBills: paid,
+            unpaidBills: unpaid
         });
 
         } catch (error) {
@@ -37,37 +51,36 @@ function Dashboard() {
         <div style={{ padding: "20px" }}>
         <h1>Hostel Dashboard</h1>
 
-        <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            gap: "20px",
-            marginTop: "20px"
-        }}>
+        <div style={gridStyle}>
 
-            <div style={cardStyle}>
-            <h3>Total Rooms</h3>
-            <p>{stats.rooms}</p>
-            </div>
-
-            <div style={cardStyle}>
-            <h3>Total Complaints</h3>
-            <p>{stats.complaints}</p>
-            </div>
-
-            <div style={cardStyle}>
-            <h3>Total Notices</h3>
-            <p>{stats.notices}</p>
-            </div>
-
-            <div style={cardStyle}>
-            <h3>Total Attendance</h3>
-            <p>{stats.attendance}</p>
-            </div>
+            <Card title="Total Rooms" value={stats.rooms} />
+            <Card title="Students" value={stats.students} />
+            <Card title="Complaints" value={stats.complaints} />
+            <Card title="Pending Complaints" value={stats.pending} />
+            <Card title="Notices" value={stats.notices} />
+            <Card title="Paid Bills" value={stats.paidBills} />
+            <Card title="Unpaid Bills" value={stats.unpaidBills} />
 
         </div>
         </div>
     );
 }
+
+function Card({title, value}) {
+    return (
+        <div style={cardStyle}>
+        <h3>{title}</h3>
+        <p style={{fontSize:"24px"}}>{value}</p>
+        </div>
+    );
+}
+
+const gridStyle = {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: "20px",
+    marginTop: "20px"
+};
 
 const cardStyle = {
     background: "#f5f5f5",

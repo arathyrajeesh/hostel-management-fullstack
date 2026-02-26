@@ -17,12 +17,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-
+from users.views import StudentProfileViewSet
 from rooms.views import RoomViewSet
 from complaints.views import ComplaintViewSet
 from mess.views import MessMenuViewSet, MessBillViewSet
 from attendance.views import AttendanceViewSet
 from notices.views import NoticeViewSet
+from users.views import LoginView
+from users.views import add_student
+from users.views import my_profile
+from complaints.views import my_complaints
 
 router = DefaultRouter()
 router.register(r'rooms', RoomViewSet)
@@ -31,8 +35,16 @@ router.register(r'mess-menu', MessMenuViewSet)
 router.register(r'mess-bill', MessBillViewSet)
 router.register(r'attendance', AttendanceViewSet)
 router.register(r'notices', NoticeViewSet)
+router.register(r'students', StudentProfileViewSet)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('api/login/', LoginView.as_view()),
+    path('api/add-student/', add_student),
+    path('api/my-profile/', my_profile),
+    path('api/my-complaints/', my_complaints),
+
+
 ]

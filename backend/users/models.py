@@ -6,8 +6,12 @@ class User(AbstractUser):
         ('admin', 'Admin'),
         ('student', 'Student'),
     )
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='student')
 
+    def save(self, *args, **kwargs):
+        if self.is_superuser:
+            self.role = 'admin'
+        super().save(*args, **kwargs)
 
 class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
